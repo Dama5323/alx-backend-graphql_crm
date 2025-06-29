@@ -2,6 +2,8 @@ import graphene
 from graphene_django import DjangoObjectType
 from .models import Customer, Product, Order
 from django.utils.timezone import now
+from graphene_django.filter import DjangoFilterConnectionField
+from .filters import CustomerFilter, ProductFilter, OrderFilter
 
 class CustomerType(DjangoObjectType):
     class Meta:
@@ -119,11 +121,15 @@ class Mutation(graphene.ObjectType):
     create_product = CreateProduct.Field()
     create_order = CreateOrder.Field()
 
-class Query(graphene.ObjectType):  # optional placeholder
+class Query(graphene.ObjectType):
     hello = graphene.String()
+    all_customers = DjangoFilterConnectionField(CustomerType, filterset_class=CustomerFilter, order_by=graphene.List(of_type=graphene.String))
+    all_products = DjangoFilterConnectionField(ProductType, filterset_class=ProductFilter, order_by=graphene.List(of_type=graphene.String))
+    all_orders = DjangoFilterConnectionField(OrderType, filterset_class=OrderFilter, order_by=graphene.List(of_type=graphene.String))
 
     def resolve_hello(self, info):
         return "Hello, GraphQL!"
+
 
 
 
