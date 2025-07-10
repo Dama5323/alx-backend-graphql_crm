@@ -1,15 +1,20 @@
 #!/bin/bash
 
-# Resolve script directory
+# Get script directory using BASH_SOURCE
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
+cwd=$(pwd)
 
-cd "$PROJECT_ROOT" || exit
+# Navigate to project root from script dir
+cd "$SCRIPT_DIR/../.." || exit
+PROJECT_CWD=$(pwd)
 
+# Log file location
 LOG_FILE="/tmp/customer_cleanup_log.txt"
 TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 
-DELETED_COUNT=$(python3 manage.py shell -c "
+# Check if we are in correct directory
+if [ -f "manage.py" ]; then
+    DELETED_COUNT=$(python3 manage.py shell -c "
 from datetime import timedelta
 from django.utils import timezone
 from crm.models import Customer, Order
@@ -20,5 +25,10 @@ count = inactive_customers.count()
 inactive_customers.delete()
 print(count)
 ")
+else
+    echo "[$TIMESTAMP] Error: manage.py not found in $PROJECT_CWD" >> "$LOG_FILE"
+    exit 1
+fi
 
-echo "[$TIMESTAMP] Deleted $DELETED_COUNT inactive customers" >> "$LOG_FILE"
+# Write cleanup result to log
+echo "[$TIMESTAMP] Deleted $DELETED_COUNT inactive customers from cwd: $cwd" >> "$LOG_FILE"
