@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Resolve script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
+
+cd "$PROJECT_ROOT" || exit
+
 LOG_FILE="/tmp/customer_cleanup_log.txt"
 TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 
@@ -15,4 +21,4 @@ inactive_customers.delete()
 print(count)
 ")
 
-echo \"[$TIMESTAMP] Deleted \$DELETED_COUNT inactive customers\" >> \$LOG_FILE
+echo "[$TIMESTAMP] Deleted $DELETED_COUNT inactive customers" >> "$LOG_FILE"
