@@ -124,6 +124,7 @@ class Mutation(graphene.ObjectType):
     bulk_create_customers = BulkCreateCustomers.Field()
     create_product = CreateProduct.Field()
     create_order = CreateOrder.Field()
+
     update_low_stock_products = UpdateLowStockProducts.Field()
 
 
@@ -137,25 +138,27 @@ class Query(graphene.ObjectType):
         return "Hello, GraphQL!"
     
 class UpdateLowStockProducts(graphene.Mutation):
-    class Arguments:
-        pass
-
     updated_products = graphene.List(ProductType)
     message = graphene.String()
 
+    class Arguments:
+        pass
+
     def mutate(self, info):
+    
         low_stock_products = Product.objects.filter(stock__lt=10)
         updated = []
 
         for product in low_stock_products:
+           
             product.stock += 10
             product.save()
             updated.append(product)
 
+        
         return UpdateLowStockProducts(
             updated_products=updated,
             message=f"{len(updated)} products restocked successfully."
         )
     
-    schema = graphene.Schema(query=Query, mutation=Mutation)
-
+schema = graphene.Schema(query=Query, mutation=Mutation)
