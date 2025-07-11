@@ -118,7 +118,7 @@ class CreateOrder(graphene.Mutation):
     class Arguments:
         customer_id = graphene.ID(required=True)
         product_ids = graphene.List(graphene.ID, required=True)
-        order_date = graphene.DateTime()
+        order_date = graphene.String()
 
     order = graphene.Field(OrderType)
 

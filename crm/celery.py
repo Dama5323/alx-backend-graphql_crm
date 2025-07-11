@@ -1,5 +1,5 @@
 import os
-from celery import Celery
+from crm.celery import Celery
 
 # Set default Django settings module
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'crm.settings')
