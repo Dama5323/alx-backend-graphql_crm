@@ -3,3 +3,5 @@ graphene-django
 django-filter
 gql[requests]>=3.0.0
 requests
+celery==5.3.6
+django-celery-beat==2.6.0
