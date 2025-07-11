@@ -31,39 +31,37 @@ def log_crm_heartbeat():
 
 
 def update_low_stock():
-    now = datetime.datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
-    log_path = "/tmp/low_stock_updates_log.txt"
+    transport = RequestsHTTPTransport(
+        url="http://localhost:8000/graphql/",
+        verify=True,
+        retries=3,
+    )
 
-    try:
-        transport = RequestsHTTPTransport(
-            url="http://localhost:8000/graphql",
-            verify=True,
-            retries=3,
-        )
-        client = Client(transport=transport, fetch_schema_from_transport=False)
+    client = Client(transport=transport, fetch_schema_from_transport=False)
 
-    
-        mutation = gql("""
-            mutation {
-                updateLowStockProducts {
-                    updatedProducts {
-                        name
-                        stock
-                    }
-                    message
+    mutation = gql("""
+        mutation {
+            updateLowStockProducts {
+                success
+                updatedProducts {
+                    name
+                    stock
                 }
             }
-        """)
+        }
+    """)
 
+    try:
         result = client.execute(mutation)
-        updates = result["updateLowStockProducts"]["updatedProducts"]
-        message = result["updateLowStockProducts"]["message"]
+        products = result["updateLowStockProducts"]["updatedProducts"]
+        success_msg = result["updateLowStockProducts"]["success"]
 
-        with open(log_path, "a") as log:
-            log.write(f"[{now}] {message}\n")
-            for p in updates:
-                log.write(f"[{now}] Product: {p['name']} - Stock: {p['stock']}\n")
+        with open("/tmp/low_stock_updates_log.txt", "a") as f:
+            f.write(f"\n--- {datetime.now()} ---\n")
+            f.write(success_msg + "\n")
+            for p in products:
+                f.write(f"{p['name']} now has stock: {p['stock']}\n")
 
     except Exception as e:
-        with open(log_path, "a") as log:
-            log.write(f"[{now}] Error: {str(e)}\n")
+        with open("/tmp/low_stock_updates_log.txt", "a") as f:
+            f.write(f"\n[{datetime.now()}] ERROR: {str(e)}\n")

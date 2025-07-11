@@ -13,6 +13,7 @@ class CustomerType(DjangoObjectType):
 class ProductType(DjangoObjectType):
     class Meta:
         model = Product
+        fields = ("id", "name", "stock")
 
 class OrderType(DjangoObjectType):
     class Meta:
@@ -139,26 +140,20 @@ class Query(graphene.ObjectType):
     
 class UpdateLowStockProducts(graphene.Mutation):
     updated_products = graphene.List(ProductType)
-    message = graphene.String()
-
-    class Arguments:
-        pass
+    success = graphene.String()
 
     def mutate(self, info):
-    
         low_stock_products = Product.objects.filter(stock__lt=10)
         updated = []
 
         for product in low_stock_products:
-           
             product.stock += 10
             product.save()
             updated.append(product)
 
-        
         return UpdateLowStockProducts(
             updated_products=updated,
-            message=f"{len(updated)} products restocked successfully."
+            success=f"{len(updated)} product(s) updated successfully."
         )
     
 schema = graphene.Schema(query=Query, mutation=Mutation)
