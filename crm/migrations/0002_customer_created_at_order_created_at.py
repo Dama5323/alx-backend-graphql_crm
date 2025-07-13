@@ -13,13 +13,14 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='customer',
             name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=1990),
+            field=models.DateTimeField(auto_now_add=True),
             preserve_default=False,
-        ),
+            
+),
         migrations.AddField(
-            model_name='order',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=(2025, 6, 29, 5, 4)),
-            preserve_default=False,
-        ),
-    ]
+             model_name='order',
+             name='created_at',
+             field=models.DateTimeField(auto_now_add=True),
+             preserve_default=False,
+),
+]
